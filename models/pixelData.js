@@ -15,7 +15,7 @@ var PixelData = {
   band: null,
 
   /**
-   * Sets the buffer used t oread the data.
+   * Sets the buffer used to read the data.
    */
   setBuffer: function() {
     this.buffer = new Uint32Array(new ArrayBuffer(this.col * this.row) * 4);

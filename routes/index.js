@@ -3,6 +3,11 @@
  * Module Dependencies
  */
 const config = require('../config');
+let Location = require('../models/location');
+const projections = require('../models/projections');
+const locationProjector = require('../operations/locationProjector');
+
+
 const errors = require('restify-errors');
 //const Client = require('node-rest-client').Client;
 
@@ -18,8 +23,9 @@ module.exports = function(server) {
    * Get the server name and version.
    */
   server.get('/', function(req, res, next) {
-    var now = new Date().toISOString();
-    console.log(now + ' GET: /resin' );
+
+    let now = new Date().toISOString();
+    console.log(now + ' GET: /ghia-raster-server' );
 
     res.send({
       'server': `${config.name}`,
@@ -27,7 +33,30 @@ module.exports = function(server) {
     });
 
     return next();
+
   });
+
+
+
+
+  server.get('/test', function(req, res, next) {
+
+    let now = new Date().toISOString();
+    console.log(now + ' GET: /ghia-raster-server/test' );
+
+    //let loc = new Location();
+    let location = new Location(-2.575607299804688, 53.63649628489509);
+
+    let projectedLocation = locationProjector.project(location);
+
+    res.send(projectedLocation);
+
+    return next();
+
+  });
+
+
+
 
   // /**
   //  * GET the codes of a specific NUTS level.
