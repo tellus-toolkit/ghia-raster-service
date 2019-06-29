@@ -2,8 +2,6 @@
 const proj4 = require('proj4');
 const Location = require('../models/location');
 const projections = require('../models/projections');
-const jsts = require('jsts');
-
 
 
 const LocationProjector = {
@@ -14,20 +12,15 @@ const LocationProjector = {
 
   project:  function(location) {
 
-    //let projectedLocation = new Location();
-    let point1 = new jsts.geom.Point();
-    point1.x = 46;
-    point1.y = 68;
-    //let point2 = new Point();
+    let projectedLocation = new Location();
 
-    // projectedLocation.coordinates = proj4(
-    //   projections[this.fromProjection],
-    //   projections[this.toProjection],
-    //   [location.coordinates[0], location.coordinates[1]]
-    // );
+    projectedLocation.coordinates = proj4(
+      projections[this.fromProjection],
+      projections[this.toProjection],
+      [location.coordinates[0], location.coordinates[1]]
+    );
 
-    //return projectedLocation;
-    return point1;
+    return projectedLocation;
 
   }
 
