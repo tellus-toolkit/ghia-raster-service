@@ -1,0 +1,109 @@
+
+const proj4 = require('proj4');
+const jsts = require('jsts');
+const projections = require('../models/projections');
+
+
+const GeometryProjector = {
+
+  fromProjection: 'wgs84',
+
+  toProjection: 'osgb36',
+
+  /**
+   * Projects the specified 2 dimensional coordinate from the 'fromProjection' to the 'toProjection' and
+   * returns the projected coordinate.
+   *
+   * @param coordinate2D - The array holding the coordinates to project.
+   * @returns {Array.<number>}
+   */
+  projectCoordinate2D: function(coordinate2D) {
+
+    return proj4(
+      projections[this.fromProjection],
+      projections[this.toProjection],
+      [coordinate2D[0], coordinate2D[1]]
+    );
+
+  },
+
+  /**
+   * Projects the specified coordinate from the 'fromProjection' to the 'toProjection' and
+   * returns the projected jsts.geom.Coordinate.
+   *
+   * @param coordinate - The jsts.geom.Coordinate to project.
+   * @returns {jsts.geom.Coordnate}
+   */
+  projectCoordinate: function(coordinate) {
+
+    let coord = proj4(
+      projections[this.fromProjection],
+      projections[this.toProjection],
+      [coordinate[0], coordinate[1]]
+    );
+
+    let projectedCoordinate = coordinate.clone();
+
+    projectedCoordinate[0] = coord[0];
+    projectedCoordinate[1] = coord[1];
+
+    return projectedCoordinate;
+
+  },
+
+  /**
+   * Projects the specified point from the 'fromProjection' to the 'toProjection' and
+   * returns the projected jsts.geom.Point
+   *
+   * @param point - The specified point having the 'from' projection.
+   * @returns {jsts.geom.Point}
+   */
+  projectPoint: function(point) {
+
+    let geoJsonReader = new jsts.io.GeoJSONReader();
+
+    let coords = proj4(
+      projections[this.fromProjection],
+      projections[this.toProjection],
+      [point.getX(), point.getY()]
+    );
+
+    let projectedPoint = {
+      type: "Point",
+      coordinates: coords
+    };
+
+    return geoJsonReader.read(projectedPoint);
+
+  },
+
+  /**
+   * Projects the specified GeoJSON Polygon fro mthe 'fromProjection' to the 'toProjection' and
+   * returns the projected jsts.geom.Polygon
+   *
+   * @param geoJsonPolygon - The specified polygon having the 'from' projection.
+   * @returns {jsts.geom.Polygon}
+   */
+  projectSingleShellPolygon: function(geoJsonPolygon) {
+
+    let geoJsonReader = new jsts.io.GeoJSONReader();
+
+    let polygonCoordinates = geoJsonPolygon.coordinates[0];
+    let projectePolygonCoordinates = [];
+
+    for (i = 0; i < polygonCoordinates.length; i++) {
+      projectePolygonCoordinates.push(geometryProjector.projectCoordinate2D(polygonCoordinates[i]));
+    }
+
+    let projectedGeoJsonPolygon = {
+      type: "Polygon",
+      coordinates: [projectedPolygonCoordinates]
+    };
+
+    return geoJsonReader.read(projectedGeoJsonPolygon);
+
+  }
+
+};
+
+module.exports = GeometryProjector;

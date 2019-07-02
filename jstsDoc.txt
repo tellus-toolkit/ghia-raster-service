@@ -1,0 +1,355 @@
+
+
+jsts.geom
+
+  Coordinate
+    new Coordinate()
+
+    clone()                   -> {Coordinate}
+    compareTo(other)          -> {number}
+    distance(p)               -> {number}
+    equals(other)             -> {number}
+    equals2D(other)           -> {boolean}
+    setCoordinate(other)      -> {number}
+
+
+  CoordinateArrays
+    new CoordinateArrays()
+
+    static copyDeep1(coordinates)                                 -> {Array.<jsts.geom.Coordinate>}
+    static copyDeep2(src, srcStart, dest, destStart, length)
+    static hasRepeatedPoints(coord)                               -> {boolean}
+    static increasingDirection(pts)
+    static indexOf(coordinate, coordinates)
+    static minCoordinate(coordinates)
+    static ptNotInList(testPts, pts)
+    static removeRepeatedPoints()                                 -> {Array.<Coordinate>}
+    static scroll(coordinates, firstCoordinate)
+
+
+  CoordinateList
+    new CoordinateList(coord, allowRepeated)
+
+    addCoordinate(coord, allowRepeated)
+    addCoordinates(coord, allowRepeated, direction)               -> {boolean}
+    closeRing()
+    insertCoordinate(index, coord, allowRepeated)
+    toArray()                                                     -> {Array}
+    toCoordinateArray()
+
+  Dimension
+    new Dimension()
+
+    static, constant A: {number}
+    static, constant DONTCARE: {number}
+    static, constant FALSE: {number}
+    static, constant L: {number}
+    static, constant P: {number}
+    static, constant TRUE: {number}
+    static toDimensionSymbol(dimensionValue)                      -> {string}
+    static toDimensionValue(dimensionSymbol)                      -> {number}
+
+
+  Envelope
+    new Envelope()
+
+    nullable maxx: {number}
+    nullable maxy: {number}
+    nullable minx: {number}
+    nullable miny: {number}
+    static intersects(p1, p2, q)                    -> {boolean}
+    static intersectsEnvelope(p1, p2, q1, q2)       -> {boolean}
+    centre()                                        -> {jsts.geom.Coordinate}
+    clone()                                         -> {jsts.geom.Envelope}
+    contains()                                      -> {boolean}
+    containsCoordinate(p)                           -> {boolean}
+    containsEnvelope(other)                         -> {boolean}
+    containsValues(x, y)                            -> {boolean}
+    covers()
+    coversCoordinate(p)                             -> {boolean}
+    coversEnvelope(other)                           -> {boolean}
+    coversValues(x, y)                              -> {boolean}
+    distance(env)                                   -> {number}
+    equals(other)                                   -> {boolean}
+    expandBy()
+    expandByDistance(distance)
+    expandDistances(deltaX, deltaY)
+    expandToInclude()
+    expandToIncludeCoordinate(p)
+    expandToIncludeEnvelope(other)
+    expandToIncludeValues(x, y)
+    getArea()                                       -> {number}
+    getHeight()                                     -> {number}
+    getMaxX()                                       -> {number}
+    getMaxY()                                       -> {number}
+    getMinX()                                       -> {number}
+    getMinY()                                       -> {number}
+    getWidth()                                      -> {number}
+    init()
+    initFromCoordinate(p)
+    initFromCoordinates(p1, p2)
+    initFromEnvelope(env)
+    initFromValues(x1, x2, y1, y2)
+    intersection(env)                               -> {jsts.geom.Envelope}
+    intersects()                                    -> {boolean}
+    intersectsCoordinate(p)                         -> {boolean}
+    intersectsEnvelope(other)                       -> {boolean}
+    intersectsValues(x, y)                          -> {boolean}
+    isNull()                                        -> {boolean}
+    setToNull()
+    toString()                                      -> {string}
+    translate(transX, transY)
+
+
+  Geometry
+    new Geometry()
+
+    envelope()
+    protected factory
+    static hasNonEmptyElements(geometries)          -> {boolean}
+    static hasNullElements(array)                   -> {boolean}
+    apply(filter)
+    buffer(distance, quadrantSegments, endCapStyle) -> {Geometry}
+    checkNotGeometryCollection(g)
+    clone()
+    compare(a, b)                                   -> {number}
+    compareTo(other)                                -> {number}
+    compareToSameClass(o)
+    computeEnvelopeInternal()                       -> {Envelope}
+    contains(g)                                     -> {boolean}
+    convexHull()                                    -> {Geometry}
+    coveredBy(g)                                    -> {boolean}
+    covers(g)                                       -> {boolean}
+    crosses(g)                                      -> {boolean}
+    difference(other)                               -> {Geometry}
+    disjoint(g)                                     -> {boolean}
+    distance(g)                                     -> {number}
+    equal(a, b , tolerance)                         -> {boolean}
+    equals(o)                                       -> {boolean}
+    equalsExact(other, tolerance)                   -> {boolean}
+    equalsNorm(g)                                   -> {boolean}
+    equalsTopo(g)                                   -> {boolean}
+    getArea()
+    getBoundary()                                   -> {Geometry}
+    getBoundaryDimension()                          -> {number}
+    getCentroid()
+    getCoordinate()                                 -> {Coordinate}
+    getCoordinates()                                -> {Array.<Coordinate>}
+    getDimension()                                  -> {number}
+    getEnvelope()                                   -> {Geometry}
+    getEnvelopeInternal()                           -> {Envelope}
+    getFactory()                                    -> {GeometryFactory}
+    getGeometryN(n)                                 -> {Geometry}
+    getGeometryType()                               -> {string}
+    getInteriorPoint()                              -> {Point}
+    getLength()
+    getNumGeometries()                              -> {number}
+    getNumPoints()                                  -> {number}
+    getPrecisionModel()                             -> {PrecisionModel}
+    intersection(other)                             -> {Geometry}
+    intersects(g)                                   -> {boolean}
+    isEmpty()                                       -> {boolean}
+    isEquivalentClass(other)                        -> {boolean}
+    isGeometryCollection()                          -> {boolean}
+    isGeometryCollectionBase()                      -> {boolean}
+    isSimple()                                      -> {boolean}
+    isValid()                                       -> {boolean}
+    isWithinDistance(geom, distance)                -> {boolean}
+    norm()
+    normalize()
+    overlaps(g)                                     -> {boolean}
+    relate(other, intersectionPattern)              -> {boolean}
+    relate2(g)                                      -> {IntersectionMatrix}
+    symDifference(other)                            -> {Geometry}
+    touches(g)                                      -> {boolean}
+    union(other)                                    -> {Geometry}
+    within(g)                                       -> {boolean}
+
+  GeometryCollection
+
+  GeometryFactory
+    new GeometryFactory()
+
+    buildGeometry(geomList)                         -> {Geometry}
+    createLinearRing(coordinates)                   -> {LinearRing}
+    createLineString(coordinates)                   -> {LineString}
+    createPoint(coordinate)                         -> {Point}
+    createPolygon(shell, holes)                     -> {Polygon}
+    toGeometry(envelope)                            -> {Geometry}
+
+
+  IntersectionMatrix
+    new IntersectionMatrix(elements)
+
+    static matches(actualDimensionValue, requiredDimensionSymbol)       -> {boolean}
+    static matches2(actualDimensinSymbols, requiredDimensionSymbols)    -> {boolean}
+    add(im)
+    get(row, column)                                                    -> {int}
+    isContains()                                                        -> {boolean}
+    isCoveredBy()                                                       -> {boolean}
+    isCovers()                                                          -> {boolean}
+    isCrosses(dimensionOfGeometryA, dimensionOfGeometryB)               -> {boolean}
+    isDisjoint()                                                        -> {boolean}
+    isEquals(dimensionOfGeometryA, dimensionOfGeometryB)                -> {boolean}
+    isIntersects()                                                      -> {boolean}
+    isOverlaps(dimensionOfGeometryA, dimensionOfGeometryB)              -> {boolean}
+    isTouches(dimensionOfGeometryA, dimensionOfGeometryB)               -> {boolean}
+    isWithin()                                                          -> {boolean}
+    matches(requiredDimensionSymbols)                                   -> {boolean}
+    set(row, column, dimensionValue)
+    set2(dimensionSymbols)
+    setAll(dimensionValue)
+    setAtLeast(row, column, minimumDimensionValue)
+    setAtLeast2(minimumDimensionSymbols)
+    setAtLeastIfValid(row, column, minimumDimensionValue)
+    toString()                                                          -> {string}
+    transpose()                                                         -> {IntersectionMatrix}
+
+
+  LinearRing
+
+  LineSegment
+
+  LineString
+
+  Location
+
+  MultiLineString
+
+  MultiPoint
+
+  MultiPolygon
+
+  Point
+    new Point()
+
+    envelope
+    protected factory
+    apply(filter)
+    buffer(distance, quadrantSegments, endCapStyle) -> {Geometry}
+    checkNotGeometryCollection(g)
+    clone()
+    compare(a, b)                                   -> {number}
+    compareTo(other)                                -> {number}
+    compareToSameClass(o)
+    computeEnvelopeInternal()                       -> {Envelope}
+    contains(g)                                     -> {boolean}
+    convexHull()                                    -> {Geometry}
+    coveredBy(g)                                    -> {boolean}
+    covers(g)                                       -> {boolean}
+    crosses(g)                                      -> {boolean}
+    difference(other)                               -> {Geometry}
+    disjoint(g)                                     -> {boolean}
+    distance(g)                                     -> {number}
+    equal(a, b , tolerance)                         -> {boolean}
+    equals(o)                                       -> {boolean}
+    equalsExact(other, tolerance)                   -> {boolean}
+    equalsNorm(g)                                   -> {boolean}
+    equalsTopo(g)                                   -> {boolean}
+    getArea()
+    getBoundary()                                   -> {Geometry}
+    getBoundaryDimension()                          -> {number}
+    getCentroid()
+    getCoordinate()                                 -> {Coordinate}
+    getCoordinates()                                -> {Array.<Coordinate>}
+    getDimension()                                  -> {number}
+    getEnvelope()                                   -> {Geometry}
+    getEnvelopeInternal()                           -> {Envelope}
+    getFactory()                                    -> {GeometryFactory}
+    getGeometryN(n)                                 -> {Geometry}
+    getGeometryType()                               -> {string}
+    getInteriorPoint()                              -> {Point}
+    getLength()
+    getNumGeometries()                              -> {number}
+    getNumPoints()                                  -> {number}
+    getPrecisionModel()                             -> {PrecisionModel}
+    -getX()                                          -> {number}
+    -getY()                                          -> {number}
+    intersection(other)                             -> {Geometry}
+    intersects(g)                                   -> {boolean}
+    isEmpty()                                       -> {boolean}
+    isEquivalentClass(other)                        -> {boolean}
+    isGeometryCollection()                          -> {boolean}
+    isGeometryCollectionBase()                      -> {boolean}
+    isSimple()                                      -> {boolean}
+    isValid()                                       -> {boolean}
+    isWithinDistance(geom, distance)                -> {boolean}
+    norm()
+    normalize()
+    overlaps(g)                                     -> {boolean}
+    relate(other, intersectionPattern)              -> {boolean}
+    relate2(g)                                      -> {IntersectionMatrix}
+    -reverse()                                       -> {Point}
+    symDifference(other)                            -> {Geometry}
+    touches(g)                                      -> {boolean}
+    union(other)                                    -> {Geometry}
+    within(g)                                       -> {boolean}
+
+
+  Polygon
+    new Polygon()
+
+    envelope
+    protected factory
+    apply(filter)
+    buffer(distance, quadrantSegments, endCapStyle) -> {Geometry}
+    checkNotGeometryCollection(g)
+    clone()
+    compare(a, b)                                   -> {number}
+    compareTo(other)                                -> {number}
+    compareToSameClass(o)
+    computeEnvelopeInternal()                       -> {Envelope}
+    contains(g)                                     -> {boolean}
+    convexHull()                                    -> {Geometry}
+    coveredBy(g)                                    -> {boolean}
+    covers(g)                                       -> {boolean}
+    crosses(g)                                      -> {boolean}
+    difference(other)                               -> {Geometry}
+    disjoint(g)                                     -> {boolean}
+    distance(g)                                     -> {number}
+    equal(a, b , tolerance)                         -> {boolean}
+    equals(o)                                       -> {boolean}
+    equalsExact(other, tolerance)                   -> {boolean}
+    equalsNorm(g)                                   -> {boolean}
+    equalsTopo(g)                                   -> {boolean}
+    getArea()
+    getBoundary()                                   -> {Geometry}
+    getBoundaryDimension()                          -> {number}
+    getCentroid()
+    getCoordinate()                                 -> {Coordinate}
+    getCoordinates()                                -> {Array.<Coordinate>}
+    getDimension()                                  -> {number}
+    getEnvelope()                                   -> {Geometry}
+    getEnvelopeInternal()                           -> {Envelope}
+    getFactory()                                    -> {GeometryFactory}
+    getGeometryN(n)                                 -> {Geometry}
+    getGeometryType()                               -> {string}
+    getInteriorPoint()                              -> {Point}
+    getLength()
+    getNumGeometries()                              -> {number}
+    getNumPoints()                                  -> {number}
+    getPrecisionModel()                             -> {PrecisionModel}
+    intersection(other)                             -> {Geometry}
+    intersects(g)                                   -> {boolean}
+    isEmpty()                                       -> {boolean}
+    isEquivalentClass(other)                        -> {boolean}
+    isGeometryCollection()                          -> {boolean}
+    isGeometryCollectionBase()                      -> {boolean}
+    isSimple()                                      -> {boolean}
+    isValid()                                       -> {boolean}
+    isWithinDistance(geom, distance)                -> {boolean}
+    norm()
+    normalize()
+    overlaps(g)                                     -> {boolean}
+    relate(other, intersectionPattern)              -> {boolean}
+    relate2(g)                                      -> {IntersectionMatrix}
+    symDifference(other)                            -> {Geometry}
+    touches(g)                                      -> {boolean}
+    union(other)                                    -> {Geometry}
+    within(g)                                       -> {boolean}
+
+
+  PrecisionModel
+
+  Triangle
+

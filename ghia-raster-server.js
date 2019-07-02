@@ -83,18 +83,10 @@
 //================================================================================
 
 let jsts = require('jsts');
-let Location = require('./models/location');
+
+// let Location = require('./models/location');
 // const projections = require('./models/projections');
-const locationProjector = require('./operations/locationProjector');
-
-//let loc = new Location();
-let location = new Location(-2.575607299804688, 53.63649628489509);
-
-let projectedLocation = locationProjector.project(location);
-
-console.log();
-console.log(location);
-console.log(projectedLocation);
+const geometryProjector = require('./operations/geometryProjector');
 
 
 // Point Inside
@@ -110,7 +102,7 @@ let p2Location = {
 };
 
 // Polygon
-let polygonCoords = {
+let polygonLocations = {
   coords: [
     { coord: [-2.2576904296875004, 53.46837962792356], tile: [31,24] },
     { coord: [-2.226791381835938, 53.47900545831375], tile: [33,23] },
@@ -123,18 +115,32 @@ let polygonCoords = {
 
 
 
-
 let geoJsonReader = new jsts.io.GeoJSONReader();
 
 let geoJSON = {
   type: "Point",
-  coordinates: [-2.575607299804688, 53.63649628489509]
+  coordinates: p1Location.coord
 };
 
-let point = geoJsonReader.read(geoJSON);
+let p1 = geoJsonReader.read(geoJSON);
+let projectedP1 = geometryProjector.projectPoint(p1);
 
-console.log(point);
+console.log('');
+console.log('--------');
+console.log('Point');
+console.log(p1.getCoordinate());
+console.log(projectedP1.getCoordinate());
 
+geoJSON.coordinates = p2Location.coord;
+
+let p2 = geoJsonReader.read(geoJSON);
+let projectedP2 = geometryProjector.projectPoint(p2);
+
+console.log('');
+console.log('--------');
+console.log('Point');
+console.log(p2.getCoordinate());
+console.log(projectedP2.getCoordinate());
 
 geoJSON = {
   type: "Polygon",
@@ -150,11 +156,48 @@ geoJSON = {
   ]
 };
 
-let polygon = geoJsonReader.read(geoJSON);
+let projectedPolygon = geometryProjector.projectSingleShellPolygon(geoJSON);
 
-console.log(polygon);
+console.log('');
+console.log('--------');
+console.log('Polygon');
+console.log(geoJSON.coordinates);
+console.log(polygon.getCoordinates());
+console.log(projectedPolygon.getCoordinates());
+//console.log(geoJSON.coordinates);
 
 
+
+
+// let polygon = geoJsonReader.read(geoJSON);
+//
+// let polygonCoordinates = geoJSON.coordinates[0];
+//
+// for (i = 0; i < polygonCoordinates.length; i++) {
+//   polygonCoordinates[i] = geometryProjector.projectCoordinate2D(polygonCoordinates[i]);
+// }
+//
+// geoJSON.coordinates[0] = polygonCoordinates;
+//
+// let projectedPolygon = geoJsonReader.read(geoJSON);
+//
+// console.log('');
+// console.log('--------');
+// console.log('Polygon');
+// console.log(geoJSON.coordinates);
+// console.log(polygon.getCoordinates());
+// console.log(projectedPolygon.getCoordinates());
+// console.log(geoJSON.coordinates);
+
+
+let result = projectedPolygon.intersects(projectedP1) === true ? ' ' : ' not ';
+console.log('Point 1' + result + 'intersects polygon');
+result = projectedPolygon.intersects(projectedP2) === true ? ' ' : ' not ';
+console.log('Point 2' + result + 'intersects polygon');
+
+
+// console.log('Point 1 ' + projectedPolygon.intersects(projectedP1) === true ? '' : 'not' + ' intersects polygon.');
+// console.log('Point 2 ' + projectedPolygon.intersects(projectedP2) === true ? '' : 'not' + ' intersects polygon.');
 
 
 //================================================================================
