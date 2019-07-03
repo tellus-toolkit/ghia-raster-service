@@ -18,12 +18,21 @@ var PixelData = {
    * Sets the buffer used to read the data.
    */
   setBuffer: function() {
-    this.buffer = new Uint32Array(new ArrayBuffer(this.col * this.row) * 4);
+    this.buffer = new Uint32Array(new ArrayBuffer(this.width * this.height) * 4);
   },
 
   read: function(col, row, width, height) {
 
+    this.col = col;
+    this.row = row;
+
+    this.width = width;
+    this.height = height;
+
+    band.pixels.read(col, row, width, height, pixelData);
+
   }
+
 };
 
 

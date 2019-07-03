@@ -1,71 +1,39 @@
 
-// var gdal = require('gdal');
-// //var util = require('util');
-//
-// var filename = './data/GHIA_ILM_V_1_1.tif';
-//
-// console.log(filename);
-//
-// var ds = gdal.open(filename);
-//
-// var driver = ds.driver;
-// var driver_metadata = driver.getMetadata();
-//
-// if (driver_metadata['DCAP_RASTER'] !== 'YES') {
-//   console.error('Source file is not a raster');
-// }
-//
-// console.log('Driver: ' + driver.description);
-//
-// // Raster Dimensions
-// var size = ds.rasterSize;
-// console.log('Size is ' + size.x + ', ' + size.y);
-//
-// // Spatial Reference
-// console.log('Coordinate System is: ');
-// console.log(ds.srs.toPrettyWKT());
-//
-// console.log('--------------------------------------------------------------------------------');
-// console.log('Bands.Count: ' + ds.bands.count());
-// console.log('--------------------------------------------------------------------------------');
-//
-// var band = ds.bands.get(1);
-//
-// console.log('Band.id:  ' + band.id);
-// console.log('--------------------------------------------------------------------------------');
-//
-// console.log('Band.BlockSize.x: ' + band.blockSize.x);
-// console.log('Band.BlockSize.y: ' + band.blockSize.y);
-// console.log('Band.ColorInterpretation:  ' + band.colorInterpretation);
-// console.log('Band.DataType: ' + band.dataType);
-// console.log('Band.Description: ' + band.description);
-// console.log('Band.HasArbitraryOverviews: ' + band.hasArbitraryOverviews);
-// console.log('Band.Minimum: ' + band.minimum);
-// console.log('Band.Maximum: ' + band.maximum);
-// console.log('Band.NoDataValue: ' + band.noDataValue);
-// console.log('Band.Offset: ' + band.offset);
-// console.log('Band.ReadOnly: ' + band.readOnly);
-// console.log('Band.Scale: ' + band.scale);
-// console.log('Band.Size.x: ' + band.size.x);
-// console.log('Band.Size.y: ' + band.size.y);
-// console.log('Band.UnitType: ' + band.unitType);
-// console.log('Band.CateGoryNames:');
-// console.log('--------------------------------------------------------------------------------');
-//
-// band.categoryNames.forEach(function(categoryName) {
-//   console.log(categoryName + '\r\n');
-// });
-//
-// console.log('--------------------------------------------------------------------------------');
-// console.log('Band.Overviews.Count: ' + band.overviews.count());
-//
-// var result = band.overviews.map(function(overviewBand, i) {
-//   console.log(overviewBand.blockSize.x);
-//   console.log(overviewBand.blockSize.y);
-//   console.log(overviewBand.blockSize.minimum);
-//   console.log(overviewBand.blockSize.maximum);
-// });
-//
+const jsts = require('jsts');
+const raster = require('./models/raster.js')
+const rasterLocator = require('./operations/rasterLocator.js')
+const geometryProjector = require('./operations/geometryProjector');
+
+
+raster.getMetadata();
+
+console.log('Filename: ' + raster.filename);
+console.log('Columns: ' + raster.columns);
+console.log('Rows: ' + raster.rows);
+console.log('Cell Size: ' + raster.cellSize);
+console.log('Tile Size: ' + raster.tileSize);
+console.log('minimum x: ' + raster.xmin);
+console.log('minimum y: ' + raster.ymin);
+
+console.log('Band.BlockSize.x: ' + raster.band.blockSize.x);
+console.log('Band.BlockSize.y: ' + raster.band.blockSize.y);
+console.log('Band.ColorInterpretation:  ' + raster.band.colorInterpretation);
+console.log('Band.DataType: ' + raster.band.dataType);
+console.log('Band.Description: ' + raster.band.description);
+console.log('Band.HasArbitraryOverviews: ' + raster.band.hasArbitraryOverviews);
+console.log('Band.Minimum: ' + raster.band.minimum);
+console.log('Band.Maximum: ' + raster.band.maximum);
+console.log('Band.NoDataValue: ' + raster.band.noDataValue);
+console.log('Band.Offset: ' + raster.band.offset);
+console.log('Band.ReadOnly: ' + raster.band.readOnly);
+console.log('Band.Scale: ' + raster.band.scale);
+console.log('Band.Columns ' + raster.band.columns);
+console.log('Band.Rows: ' + raster.band.rows);
+console.log('Band.UnitType: ' + raster.band.unitType);
+
+rasterLocator.raster = raster;
+
+
 // console.log('');
 // console.log('--------------------------------------------------------------------------------');
 // console.log('Pixels');
@@ -82,11 +50,6 @@
 
 //================================================================================
 
-let jsts = require('jsts');
-
-// let Location = require('./models/location');
-// const projections = require('./models/projections');
-const geometryProjector = require('./operations/geometryProjector');
 
 
 // Point Inside
@@ -130,6 +93,8 @@ console.log('--------');
 console.log('Point');
 console.log(p1.getCoordinate());
 console.log(projectedP1.getCoordinate());
+console.log(rasterLocator.getTile(projectedP1.getCoordinate()));
+console.log(rasterLocator.getCell(projectedP1.getCoordinate()));
 
 geoJSON.coordinates = p2Location.coord;
 
@@ -141,6 +106,8 @@ console.log('--------');
 console.log('Point');
 console.log(p2.getCoordinate());
 console.log(projectedP2.getCoordinate());
+console.log(rasterLocator.getTile(projectedP2.getCoordinate()));
+console.log(rasterLocator.getCell(projectedP2.getCoordinate()));
 
 geoJSON = {
   type: "Polygon",
@@ -162,33 +129,10 @@ console.log('');
 console.log('--------');
 console.log('Polygon');
 console.log(geoJSON.coordinates);
-console.log(polygon.getCoordinates());
 console.log(projectedPolygon.getCoordinates());
-//console.log(geoJSON.coordinates);
 
-
-
-
-// let polygon = geoJsonReader.read(geoJSON);
-//
-// let polygonCoordinates = geoJSON.coordinates[0];
-//
-// for (i = 0; i < polygonCoordinates.length; i++) {
-//   polygonCoordinates[i] = geometryProjector.projectCoordinate2D(polygonCoordinates[i]);
-// }
-//
-// geoJSON.coordinates[0] = polygonCoordinates;
-//
-// let projectedPolygon = geoJsonReader.read(geoJSON);
-//
-// console.log('');
-// console.log('--------');
-// console.log('Polygon');
-// console.log(geoJSON.coordinates);
-// console.log(polygon.getCoordinates());
-// console.log(projectedPolygon.getCoordinates());
-// console.log(geoJSON.coordinates);
-
+console.log('');
+console.log('--------');
 
 let result = projectedPolygon.intersects(projectedP1) === true ? ' ' : ' not ';
 console.log('Point 1' + result + 'intersects polygon');
@@ -196,8 +140,26 @@ result = projectedPolygon.intersects(projectedP2) === true ? ' ' : ' not ';
 console.log('Point 2' + result + 'intersects polygon');
 
 
-// console.log('Point 1 ' + projectedPolygon.intersects(projectedP1) === true ? '' : 'not' + ' intersects polygon.');
-// console.log('Point 2 ' + projectedPolygon.intersects(projectedP2) === true ? '' : 'not' + ' intersects polygon.');
+let upperLeftCell = rasterLocator.getCellByXY(projectedP1.getX() - 500, projectedP1.getY() + 500);
+let lowerRightCell = rasterLocator.getCellByXY(projectedP1.getX() + 500, projectedP1.getY() - 500);
+
+console.log(upperLeftCell);
+console.log(lowerRightCell);
+
+// let pixels = 100*100;
+// let pixelData = new Uint32Array(new ArrayBuffer(pixels * 4));
+//
+// band.pixels.read(3285, 3385, 100, 100, pixelData);
+//
+// console.log(pixelData);
+
+let pixelData = raster.read(upperLeftCell[0], upperLeftCell[1], 100, 100);
+
+// console.log(pixelData);
+
+for (i = 0; i < pixelData.length; i++) {
+  console.log(pixelData[i]);
+}
 
 
 //================================================================================

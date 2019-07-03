@@ -32,20 +32,20 @@ const GeometryProjector = {
    * returns the projected jsts.geom.Coordinate.
    *
    * @param coordinate - The jsts.geom.Coordinate to project.
-   * @returns {jsts.geom.Coordnate}
+   * @returns {jsts.geom.Coordinate}
    */
   projectCoordinate: function(coordinate) {
 
     let coord = proj4(
       projections[this.fromProjection],
       projections[this.toProjection],
-      [coordinate[0], coordinate[1]]
+      [coordinate.x, coordinate.y]
     );
 
     let projectedCoordinate = coordinate.clone();
 
-    projectedCoordinate[0] = coord[0];
-    projectedCoordinate[1] = coord[1];
+    projectedCoordinate.x = coord[0];
+    projectedCoordinate.y = coord[1];
 
     return projectedCoordinate;
 
@@ -89,10 +89,10 @@ const GeometryProjector = {
     let geoJsonReader = new jsts.io.GeoJSONReader();
 
     let polygonCoordinates = geoJsonPolygon.coordinates[0];
-    let projectePolygonCoordinates = [];
+    let projectedPolygonCoordinates = [];
 
     for (i = 0; i < polygonCoordinates.length; i++) {
-      projectePolygonCoordinates.push(geometryProjector.projectCoordinate2D(polygonCoordinates[i]));
+      projectedPolygonCoordinates.push(GeometryProjector.projectCoordinate2D(polygonCoordinates[i]));
     }
 
     let projectedGeoJsonPolygon = {
