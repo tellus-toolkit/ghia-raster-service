@@ -1,6 +1,7 @@
 
+// Module Dependencies.
 const gdal = require('gdal');
-const raster = require('../models/raster.js')
+const raster = require('../models/raster.js');
 
 
 const RasterReader = {

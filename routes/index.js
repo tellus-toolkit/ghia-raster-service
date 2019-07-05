@@ -1,26 +1,23 @@
 
-/**
- * Module Dependencies
- */
+// Module Dependencies.
 const config = require('../config');
-let Location = require('../models/location');
-const projections = require('../models/projections');
-const locationProjector = require('../operations/locationProjector');
-
-
 const errors = require('restify-errors');
 //const Client = require('node-rest-client').Client;
+const raster = require('../models/raster.js');
+const rasterReader = require('../operations/rasterReader.js');
+const rasterLocator = require('../operations/rasterLocator.js');
+const geometryProjector = require('../operations/geometryProjector');
+
 
 /**
- * Model Schema
+ * Exports the routes of the server.
+ *
+ * @param server - The server object.
  */
-//const NutsCodes = require('../models/nutsCodesModel');
-//const Typology = require('../models/typologyModel');
-
 module.exports = function(server) {
 
   /**
-   * Get the server name and version.
+   * GET the server name and version.
    */
   server.get('/', function(req, res, next) {
 
@@ -44,16 +41,107 @@ module.exports = function(server) {
     let now = new Date().toISOString();
     console.log(now + ' GET: /ghia-raster-server/test' );
 
-    //let loc = new Location();
-    let location = new Location(-2.575607299804688, 53.63649628489509);
 
-    let projectedLocation = locationProjector.project(location);
+    // let location = new Location(-2.575607299804688, 53.63649628489509);
+    //
+    // let projectedLocation = locationProjector.project(location);
+    //
+    // res.send(projectedLocation);
 
-    res.send(projectedLocation);
+
+    let rasterMetadata = {
+      filename: rasterReader.filename,
+      columns: raster.getColumns(),
+      rows:  raster.getRows()
+    };
+
+    res.send(rasterMetadata);
+
 
     return next();
 
   });
+
+
+  /**
+   * GET the raster metadata.
+   */
+  server.get('/raster-metadata', function(req, res, next) {
+
+    let now = new Date().toISOString();
+    console.log(now + ' GET: /ghia-raster-server/raster-metadata' );
+
+    // Get the band of the raster.
+    let band = raster.getBand();
+
+    // Get the statistics of the raster band.
+    let statistics = band.getStatistics(false, true);
+
+    let rasterMetadata = {
+      cellSize: raster.getCellSize(),
+      tileSize: raster.getTileSize(),
+      minimumX: raster.getXmin(),
+      minimumY: raster.getYmin(),
+      columns: raster.getBandColumns(),
+      rows:  raster.getBandRows(),
+      band:{
+        dataType: band.dataType,
+        minimum: band.minimum,
+        maximum: band.maximum,
+        noDataValue: band.noDataValue,
+        statistics: {
+          minimum: statistics.min,
+          maximum: statistics.max,
+          average: statistics.mean,
+          StandardDeviation: statistics.std_dev
+        },
+        lookup: raster.lookup,
+        dictionary: raster.dictionary
+      }
+    };
+
+    res.send(rasterMetadata);
+
+    return next();
+
+  });
+
+  /**
+   * GET the report of the values of the raster based on a latitude, longitude location.
+   */
+  server.get('/report/@:lat(^[-]?\\d*\\.?\\d*),:lon(^[-]?\\d*\\.?\\d*)', (req, res, next) => {
+
+    var now = new Date().toISOString();
+    console.log(now + ' GET: /ghia-raster-server/report/:lat=' + req.params.lat + ',:lon=' + req.params.lon);
+
+    let coordinate = [parseFloat(req.params.lon), parseFloat(req.params.lat)];
+
+    let projectedCoordinate = geometryProjector.projectCoordinate2D(coordinate);
+
+    let upperLeftCell = rasterLocator.getCellByXY(projectedCoordinate[0] - 500, projectedCoordinate[1] + 500);
+    // let lowerRightCell = rasterLocator.getCellByXY(projectedCoordinate[0] + 500, projectedCoordinate[1] - 500);
+
+    let cellBlockSize = raster.getTileSize() / raster.getCellSize();
+
+    let buffer = rasterReader.read(upperLeftCell[0], upperLeftCell[1], 100, 100);
+
+    let histogram = rasterReader.getBufferHistogram(buffer);
+
+    let report = {
+      location: {
+        x: projectedCoordinate[0],
+        y: projectedCoordinate[1]
+      },
+      histogram: histogram
+    };
+
+    res.send(report);
+
+    return next();
+
+  });
+
+
 
 
 
