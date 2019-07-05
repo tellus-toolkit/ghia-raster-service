@@ -1,51 +1,51 @@
 
 const jsts = require('jsts');
-const raster = require('./models/raster.js')
-const rasterLocator = require('./operations/rasterLocator.js')
+//const raster = require('./models/raster.js');
+const rasterReader = require('./operations/rasterReader.js');
+const rasterLocator = require('./operations/rasterLocator.js');
 const geometryProjector = require('./operations/geometryProjector');
 
 
-raster.getMetadata();
+let raster = rasterReader.open();
 
-console.log('Filename: ' + raster.filename);
-console.log('Columns: ' + raster.columns);
-console.log('Rows: ' + raster.rows);
-console.log('Cell Size: ' + raster.cellSize);
-console.log('Tile Size: ' + raster.tileSize);
-console.log('minimum x: ' + raster.xmin);
-console.log('minimum y: ' + raster.ymin);
 
-console.log('Band.BlockSize.x: ' + raster.band.blockSize.x);
-console.log('Band.BlockSize.y: ' + raster.band.blockSize.y);
-console.log('Band.ColorInterpretation:  ' + raster.band.colorInterpretation);
-console.log('Band.DataType: ' + raster.band.dataType);
-console.log('Band.Description: ' + raster.band.description);
-console.log('Band.HasArbitraryOverviews: ' + raster.band.hasArbitraryOverviews);
-console.log('Band.Minimum: ' + raster.band.minimum);
-console.log('Band.Maximum: ' + raster.band.maximum);
-console.log('Band.NoDataValue: ' + raster.band.noDataValue);
-console.log('Band.Offset: ' + raster.band.offset);
-console.log('Band.ReadOnly: ' + raster.band.readOnly);
-console.log('Band.Scale: ' + raster.band.scale);
-console.log('Band.Columns ' + raster.band.columns);
-console.log('Band.Rows: ' + raster.band.rows);
-console.log('Band.UnitType: ' + raster.band.unitType);
+console.log('Filename: ' + rasterReader.filename);
+
+console.log('Columns: ' + raster.getColumns());
+console.log('Rows: ' + raster.getRows());
+console.log('Cell Size: ' + raster.getCellSize());
+console.log('Tile Size: ' + raster.getTileSize());
+console.log('minimum x: ' + raster.getXmin());
+console.log('minimum y: ' + raster.getYmin());
+
+let band = raster.getBand();
+
+console.log('Band.Id: ' + band.id);
+console.log('Band.BlockSize.x: ' + band.blockSize.x);
+console.log('Band.BlockSize.y: ' + band.blockSize.y);
+console.log('Band.ColorInterpretation:  ' + raster.getBand().colorInterpretation);
+console.log('Band.DataType: ' + band.dataType);
+console.log('Band.Description: ' + band.description);
+console.log('Band.HasArbitraryOverviews: ' + band.hasArbitraryOverviews);
+console.log('Band.Minimum: ' + band.minimum);
+console.log('Band.Maximum: ' + band.maximum);
+console.log('Band.NoDataValue: ' + band.noDataValue);
+console.log('Band.Offset: ' + band.offset);
+console.log('Band.ReadOnly: ' + band.readOnly);
+console.log('Band.Scale: ' + band.scale);
+console.log('Band.Columns ' + raster.getBandColumns());
+console.log('Band.Rows: ' + raster.getBandRows());
+console.log('Band.UnitType: ' + band.unitType);
+
+let statistics = band.getStatistics(false, true);
+
+console.log('Band.Statistics.Minimum: ' + statistics.min);
+console.log('Band.Statistics.Maximum: ' + statistics.max);
+console.log('Band.Statistics.Mean: ' + statistics.mean);
+console.log('Band.Statistics.StandardDeviation: ' + statistics.std_dev);
+
 
 rasterLocator.raster = raster;
-
-
-// console.log('');
-// console.log('--------------------------------------------------------------------------------');
-// console.log('Pixels');
-// console.log('--------------------------------------------------------------------------------');
-//
-//
-// let pixels = 100*100;
-// let pixelData = new Uint32Array(new ArrayBuffer(pixels * 4));
-//
-// band.pixels.read(2900, 1900, 100, 100, pixelData);
-//
-// console.log(pixelData);
 
 
 //================================================================================
@@ -93,6 +93,7 @@ console.log('--------');
 console.log('Point');
 console.log(p1.getCoordinate());
 console.log(projectedP1.getCoordinate());
+console.log(p1Location.tile);
 console.log(rasterLocator.getTile(projectedP1.getCoordinate()));
 console.log(rasterLocator.getCell(projectedP1.getCoordinate()));
 
@@ -106,6 +107,7 @@ console.log('--------');
 console.log('Point');
 console.log(p2.getCoordinate());
 console.log(projectedP2.getCoordinate());
+console.log(p2Location.tile);
 console.log(rasterLocator.getTile(projectedP2.getCoordinate()));
 console.log(rasterLocator.getCell(projectedP2.getCoordinate()));
 
@@ -146,6 +148,7 @@ let lowerRightCell = rasterLocator.getCellByXY(projectedP1.getX() + 500, project
 console.log(upperLeftCell);
 console.log(lowerRightCell);
 
+
 // let pixels = 100*100;
 // let pixelData = new Uint32Array(new ArrayBuffer(pixels * 4));
 //
@@ -153,13 +156,25 @@ console.log(lowerRightCell);
 //
 // console.log(pixelData);
 
-let pixelData = raster.read(upperLeftCell[0], upperLeftCell[1], 100, 100);
+let pixelData = rasterReader.read(upperLeftCell[0], upperLeftCell[1], 100, 100);
+// let pixelData = rasterReader.read(0, 0, 100, 100);
 
 // console.log(pixelData);
 
-for (i = 0; i < pixelData.length; i++) {
-  console.log(pixelData[i]);
+for (let i = 0; i < pixelData.length; i++) {
+  //console.log(pixelData[i]);
 }
+
+let histogram = rasterReader.getBufferHistogram(pixelData);
+
+for (var key in histogram) {
+  if (histogram.hasOwnProperty(key)) {
+    console.log(key + ': ' + histogram[key]);
+  }
+}
+
+
+
 
 
 //================================================================================

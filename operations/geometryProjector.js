@@ -4,10 +4,19 @@ const jsts = require('jsts');
 const projections = require('../models/projections');
 
 
+/**
+ * Projects a coordinate from The 'fromProjection' to the 'toProjection'.
+ */
 const GeometryProjector = {
 
+  /**
+   * The name of the 'from' projection.
+   */
   fromProjection: 'wgs84',
 
+  /**
+   * The name of the 'to' projection.
+   */
   toProjection: 'osgb36',
 
   /**
@@ -78,10 +87,10 @@ const GeometryProjector = {
   },
 
   /**
-   * Projects the specified GeoJSON Polygon fro mthe 'fromProjection' to the 'toProjection' and
+   * Projects the specified GeoJSON Polygon from the 'fromProjection' to the 'toProjection' and
    * returns the projected jsts.geom.Polygon
    *
-   * @param geoJsonPolygon - The specified polygon having the 'from' projection.
+   * @param geoJsonPolygon - The specified polygon having the 'from' projection. This is a single shell polygon.
    * @returns {jsts.geom.Polygon}
    */
   projectSingleShellPolygon: function(geoJsonPolygon) {
