@@ -42,20 +42,39 @@ module.exports = function(server) {
     console.log(now + ' GET: /ghia-raster-server/test' );
 
 
-    // let location = new Location(-2.575607299804688, 53.63649628489509);
-    //
-    // let projectedLocation = locationProjector.project(location);
-    //
-    // res.send(projectedLocation);
-
-
-    let rasterMetadata = {
-      filename: rasterReader.filename,
-      columns: raster.getColumns(),
-      rows:  raster.getRows()
+    let result = {
+      data: 'test'
     };
 
-    res.send(rasterMetadata);
+
+    // let coordinate = [parseFloat(req.params.lon), parseFloat(req.params.lat)];
+    //
+    // let projectedCoordinate = geometryProjector.projectCoordinate2D(coordinate);
+
+    // let upperLeftCell = rasterLocator.getCellByXY(projectedCoordinate[0] - 500, projectedCoordinate[1] + 500);
+    // // let lowerRightCell = rasterLocator.getCellByXY(projectedCoordinate[0] + 500, projectedCoordinate[1] - 500);
+    //
+    // let cellBlockSize = raster.getTileSize() / raster.getCellSize();
+    //
+    // let buffer = rasterReader.read(upperLeftCell[0], upperLeftCell[1], 100, 100);
+    //
+    // let histogram = rasterReader.getBufferHistogram(buffer);
+    //
+    // let report = {
+    //   location: {
+    //     x: projectedCoordinate[0],
+    //     y: projectedCoordinate[1]
+    //   },
+    //   histogram: histogram
+    // };
+
+    // let band = ds.bands.get(1);
+    let band = raster.getBand();
+    let val = band.pixels.get(raster.getBandColumns() - 1, raster.getBandRows() - 1);
+
+    result.data = val;
+
+    res.send(result);
 
 
     return next();
@@ -119,20 +138,38 @@ module.exports = function(server) {
     let projectedCoordinate = geometryProjector.projectCoordinate2D(coordinate);
 
     let upperLeftCell = rasterLocator.getCellByXY(projectedCoordinate[0] - 500, projectedCoordinate[1] + 500);
-    // let lowerRightCell = rasterLocator.getCellByXY(projectedCoordinate[0] + 500, projectedCoordinate[1] - 500);
+    let lowerRightCell = rasterLocator.getCellByXY(projectedCoordinate[0] + 500, projectedCoordinate[1] - 500);
 
-    let cellBlockSize = raster.getTileSize() / raster.getCellSize();
+    //let cellBlockSize = raster.getTileSize() / raster.getCellSize();
+    let width = lowerRightCell[0] - upperLeftCell[0] + 1;
+    let height = lowerRightCell[1] - upperLeftCell[1] + 1;
 
-    let buffer = rasterReader.read(upperLeftCell[0], upperLeftCell[1], 100, 100);
+    // let buffer = rasterReader.read(upperLeftCell[0], upperLeftCell[1], cellBlockSize, cellBlockSize);
+    let buffer = rasterReader.read(upperLeftCell[0], upperLeftCell[1], width, height);
 
     let histogram = rasterReader.getBufferHistogram(buffer);
 
     let report = {
       location: {
-        x: projectedCoordinate[0],
-        y: projectedCoordinate[1]
+        geographic: {
+          lon: coordinate[0],
+          lat: coordinate[1]
+        },
+        projected: {
+          x: projectedCoordinate[0],
+          y: projectedCoordinate[1]
+        }
       },
-      histogram: histogram
+      raster: {
+        envelope: {
+          minRow: upperLeftCell[1],
+          minCol: upperLeftCell[0],
+          maxRow: lowerRightCell[1],
+          maxCol: lowerRightCell[0]
+        },
+        totalCells: width * height,
+        histogram: histogram
+      }
     };
 
     res.send(report);
@@ -141,6 +178,110 @@ module.exports = function(server) {
 
   });
 
+
+
+  server.post('/report', (req, res, next) => {
+
+    var now = new Date().toISOString();
+    console.log(now + ' POST: /ghia-raster-server/report/');
+
+    console.log('');
+    console.log(req.params.polygon);
+
+    let polygon = req.params.polygon;
+
+    // geoJSON = {
+    //   type: "Polygon",
+    //   coordinates: [
+    //     [
+    //       [-2.2576904296875004, 53.46837962792356],
+    //       [-2.226791381835938, 53.47900545831375],
+    //       [-2.19503402709961, 53.45882432637676],
+    //       [-2.227392196655274, 53.45867101524035],
+    //       [-2.2594928741455083, 53.4496246783658],
+    //       [-2.2576904296875004, 53.46837962792356]
+    //     ]
+    //   ]
+    // };
+
+    // geoJSON = {type: "Polygon", coordinates: [[[-2.2576904296875004, 53.46837962792356],[-2.226791381835938, 53.47900545831375],[-2.19503402709961, 53.45882432637676],[-2.227392196655274, 53.45867101524035],[-2.2594928741455083, 53.4496246783658],[-2.2576904296875004, 53.46837962792356]]]};
+
+
+    let projectedPolygon = geometryProjector.projectSingleShellPolygon(polygon);
+
+    let coords = projectedPolygon.getCoordinates();
+
+    let envelope = rasterLocator.getEnvelopeCells(coords);
+
+
+    //let cellBlockSize = raster.getTileSize() / raster.getCellSize();
+    let width = envelope[1][0] - envelope[0][0] + 1;
+    let height = envelope[1][1] - envelope[0][1] + 1;
+
+    // let buffer = rasterReader.read(upperLeftCell[0], upperLeftCell[1], cellBlockSize, cellBlockSize);
+    let buffer = rasterReader.read(envelope[0][0], envelope[0][1], width, height);
+
+    let histogram = rasterReader.getBufferHistogram(buffer);
+
+    let report = {
+      raster: {
+        envelope: {
+          minRow: envelope[0][1],
+          minCol: envelope[0][0],
+          maxRow: envelope[1][1],
+          maxCol: envelope[1][0]
+        },
+        totalCells: width * height,
+        histogram: histogram
+      }
+    };
+
+    res.send(report);
+
+    return next();
+
+
+//
+// console.log('');
+// console.log('--------');
+// console.log('Polygon');
+// console.log(geoJSON.coordinates);
+// console.log(projectedPolygon.getCoordinates());
+//
+// console.log('');
+// console.log('--------');
+//
+// let result = projectedPolygon.intersects(projectedP1) === true ? ' ' : ' not ';
+// console.log('Point 1' + result + 'intersects polygon');
+// result = projectedPolygon.intersects(projectedP2) === true ? ' ' : ' not ';
+// console.log('Point 2' + result + 'intersects polygon');
+//
+//
+// let upperLeftCell = rasterLocator.getCellByXY(projectedP1.getX() - 500, projectedP1.getY() + 500);
+// let lowerRightCell = rasterLocator.getCellByXY(projectedP1.getX() + 500, projectedP1.getY() - 500);
+//
+// console.log(upperLeftCell);
+// console.log(lowerRightCell);
+//
+// let pixelData = rasterReader.read(upperLeftCell[0], upperLeftCell[1], 100, 100);
+// // let pixelData = rasterReader.read(0, 0, 100, 100);
+//
+// // console.log(pixelData);
+//
+// for (let i = 0; i < pixelData.length; i++) {
+//   //console.log(pixelData[i]);
+// }
+//
+// let histogram = rasterReader.getBufferHistogram(pixelData);
+//
+// for (var key in histogram) {
+//   if (histogram.hasOwnProperty(key)) {
+//     console.log(key + ': ' + histogram[key]);
+//   }
+// }
+
+
+  });
 
 
 

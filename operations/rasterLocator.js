@@ -95,6 +95,41 @@ const RasterLocator = {
   },
 
   /**
+   * Gets an envelope of raster cells.
+   *
+   * @param coordsArray - The Array<jsts.geom.Coordinate> that will be used to get the envelope of raster cells.
+   * @returns {Array<Array<number>>} - A 2 position array having the minimum and maximum cells of the envelope.
+   */
+  getEnvelopeCells: function(coordsArray) {
+
+    let minx = coordsArray[0].x;
+    let miny = coordsArray[0].y;
+    let maxx = coordsArray[0].x;
+    let maxy = coordsArray[0].y;
+
+    for (let i = 1; i < coordsArray.length; i++) {
+      if (minx > coordsArray[i].x) {
+        minx = coordsArray[i].x;
+      }
+      if (miny > coordsArray[i].y) {
+        miny = coordsArray[i].y;
+      }
+      if (maxx < coordsArray[i].x) {
+        maxx = coordsArray[i].x;
+      }
+      if (maxy < coordsArray[i].y) {
+        maxy = coordsArray[i].y;
+      }
+    }
+
+    let minCell = this.getCellByXY(minx, maxy);
+    let maxCell = this.getCellByXY(maxx, miny);
+
+    return [minCell, maxCell];
+
+  },
+
+  /**
    * Restrains the current cell within the raster band's bounds.
    *
    * @param col - The column in which the cell belongs.
