@@ -1,4 +1,12 @@
 
+// ================================================================================
+//  TellUs Toolkit Ltd.
+//  https://www.tellus-toolkit.com/
+//
+//  Name:            projections.js
+//  Original coding: Vasilis Vlastaras (@gisvlasta), 29/06/2019.
+// ================================================================================
+
 /**
  * The named projections used in the application.
  *

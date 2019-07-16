@@ -1,9 +1,20 @@
 
+// ================================================================================
+//  TellUs Toolkit Ltd.
+//  https://www.tellus-toolkit.com/
+//
+//  Name:            rasterReader.js
+//  Original coding: Vasilis Vlastaras (@gisvlasta), 06/07/2019.
+// ================================================================================
+
 // Module Dependencies.
 const gdal = require('gdal');
+const jsts = require('jsts');
 const raster = require('../models/raster.js');
 
-
+/**
+ * The RasterReader provides methods to read information from a specified raster file.
+ */
 const RasterReader = {
 
   /**
@@ -59,18 +70,17 @@ const RasterReader = {
 
   },
 
+  /**
+   * Gets the histogram of raster values in a buffer.
+   *
+   * @param buffer - The buffer having the raster values.
+   * @returns {object} - An object representing the histogram.
+   */
+  getEnvelopeHistogram(buffer) {
 
-  getBufferStatistics(buffer) {
-
-    for (i = 0; i < buffer.length; i++) {
-      console.log(buffer[i]);
-    }
-
-  },
-
-  getBufferHistogram(buffer) {
-
-    let histogram = {};
+    let histogram = {
+      totalCells: buffer.length
+    };
 
     histogram[buffer[0]] = 1;
 
@@ -84,6 +94,78 @@ const RasterReader = {
         histogram[value] = 1;
       }
 
+    }
+
+    return histogram;
+
+  },
+
+  /**
+   * Gets the histogram of raster values that intersect a specified polygon.
+   *
+   * @param buffer - The buffer having the raster values of the envelope enclosing the polygon.
+   * @param envelope - The envelope of the polygon expressed in raster column and row coordinates.
+   * @param polygon - The jsts.geom.Polygon that is used to extract the raster values from the buffer.
+   * @returns {object} - An object representing the histogram.
+   */
+  getPolygonHistogram(buffer, envelope, polygon) {
+
+    let cellSize = raster.getCellSize();
+    let leftX = raster.getXmin();
+    let topY = raster.getYmin() + raster.getBandRows() * cellSize;
+
+    minCol = envelope[0][0];
+    minRow = envelope[0][1];
+    cols = envelope[1][0] - minCol + 1;
+    rows = envelope[1][1] - minRow + 1;
+
+    let geoJsonReader = new jsts.io.GeoJSONReader();
+
+    let bufferIndex = 0;
+
+    let histogram = {
+      totalCells: 0
+    };
+
+    for (let c = 0; c < cols; c++) {
+      for (let r = 0; r < rows; r++) {
+
+        cellLeftX = leftX + (minCol + c) * cellSize;
+        cellTopY = topY - (minRow + r) * cellSize;
+
+        let cellGeoJSON = {
+          type: "Polygon",
+          coordinates: [
+            [
+              [cellLeftX,            cellTopY           ], // left-top
+              [cellLeftX + cellSize, cellTopY           ], // right-top
+              [cellLeftX + cellSize, cellTopY - cellSize], // right-bottom
+              [cellLeftX,            cellTopY - cellSize], // left-bottom
+              [cellLeftX,            cellTopY           ]  // left-top
+            ]
+          ]
+        };
+
+        let cell = geoJsonReader.read(cellGeoJSON);
+
+        if (polygon.intersects(cell)) {
+
+          histogram.totalCells++;
+
+          let value = buffer[bufferIndex];
+
+          if (histogram.hasOwnProperty(value)) {
+            histogram[value]++;
+          }
+          else {
+            histogram[value] = 1;
+          }
+
+        }
+
+        bufferIndex++;
+
+      }
     }
 
     return histogram;

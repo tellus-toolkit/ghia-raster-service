@@ -1,4 +1,12 @@
 
+// ================================================================================
+//  TellUs Toolkit Ltd.
+//  https://www.tellus-toolkit.com/
+//
+//  Name:            raster.js
+//  Original coding: Vasilis Vlastaras (@gisvlasta), 06/07/2019.
+// ================================================================================
+
 /**
  * A single band raster.
  */

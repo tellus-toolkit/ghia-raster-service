@@ -1,4 +1,12 @@
 
+// ================================================================================
+//  TellUs Toolkit Ltd.
+//  https://www.tellus-toolkit.com/
+//
+//  Name:            rasterLocator.js
+//  Original coding: Vasilis Vlastaras (@gisvlasta), 14/07/2019.
+// ================================================================================
+
 /**
  * The RasterLocator provides methods to locate tiles or cells of an associated raster file
  * retrieved using spatial locations.

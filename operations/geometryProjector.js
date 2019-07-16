@@ -1,9 +1,16 @@
 
+// ================================================================================
+//  TellUs Toolkit Ltd.
+//  https://www.tellus-toolkit.com/
+//
+//  Name:            geometryProjector.js
+//  Original coding: Vasilis Vlastaras (@gisvlasta), 06/07/2019.
+// ================================================================================
+
 // Module Dependencies.
 const proj4 = require('proj4');
 const jsts = require('jsts');
 const projections = require('../models/projections');
-
 
 /**
  * Projects a coordinate from The 'fromProjection' to the 'toProjection'.
