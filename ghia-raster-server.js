@@ -31,6 +31,12 @@ const server = restify.createServer({
 });
 
 // Middleware.
+// TODO: Experiment with CORS by checking the following:
+// https://stackoverflow.com/questions/14338683/how-can-i-support-cors-when-using-restify
+// https://github.com/Tabcorp/restify-cors-middleware
+// https://codepunk.io/using-cors-with-restify-in-nodejs/
+// https://www.npmjs.com/package/restify-cors-middleware
+// https://www.google.com/search?q=restify+CORS&rlz=1C1GCEU_en&oq=restify+CORS&aqs=chrome..69i57.5679j0j7&sourceid=chrome&ie=UTF-8
 server.use(
   function crossOrigin(req,res,next){
     res.header("Access-Control-Allow-Origin", "*");
