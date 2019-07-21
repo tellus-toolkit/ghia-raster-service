@@ -5,6 +5,8 @@
 //
 //  Name:            ghia-raster-server.js
 //  Original coding: Vasilis Vlastaras (@gisvlasta), 16/07/2019.
+//  Updated:         Vasilis Vlastaras (@gisvlasta), 21/07/2019.
+//                   Added CORS Access-Control-Allow-Origin for all possible clients.
 // ================================================================================
 
 /**
@@ -29,6 +31,13 @@ const server = restify.createServer({
 });
 
 // Middleware.
+server.use(
+  function crossOrigin(req,res,next){
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    return next();
+  }
+);
 server.use(restifyPlugins.jsonBodyParser({ mapParams: true }));
 server.use(restifyPlugins.acceptParser(server.acceptable));
 server.use(restifyPlugins.queryParser({ mapParams: true }));
