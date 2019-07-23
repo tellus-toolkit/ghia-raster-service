@@ -13,7 +13,7 @@
  */
 module.exports = {
   name: 'GHIA Raster Server',
-  version: '1.0.1',
+  version: '1.0.2',
   //env: process.env.NODE_ENV || 'development',
   env: 'production',
   port: process.env.PORT || 8083,

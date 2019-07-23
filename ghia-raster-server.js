@@ -37,10 +37,15 @@ const server = restify.createServer({
 // https://codepunk.io/using-cors-with-restify-in-nodejs/
 // https://www.npmjs.com/package/restify-cors-middleware
 // https://www.google.com/search?q=restify+CORS&rlz=1C1GCEU_en&oq=restify+CORS&aqs=chrome..69i57.5679j0j7&sourceid=chrome&ie=UTF-8
+// https://stackoverflow.com/questions/43871637/no-access-control-allow-origin-header-is-present-on-the-requested-resource-whe/43881141
+// https://stackoverflow.com/questions/35588699/response-to-preflight-request-doesnt-pass-access-control-check
 server.use(
-  function crossOrigin(req,res,next){
+  function crossOrigin(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    res.header("Access-Control-Allow-Methods", "*");
+    // res.header("Access-Control-Allow-Methods", "GET, POST");
+    res.header("Access-Control-Allow-Headers", "*");
+    // res.header("Access-Control-Allow-Headers", "X-Requested-With");
     return next();
   }
 );

@@ -153,11 +153,10 @@ module.exports = function(server) {
     var now = new Date().toISOString();
     console.log(now + ' POST: /ghia-raster-server/report/');
 
-    let polygonGeoJSON = req.params.polygon;
-    console.log(polygonGeoJSON);
-    console.log();
+    let polygon = req.params.polygon;
 
-    let polygon = JSON.parse(polygonGeoJSON);
+    console.log(JSON.stringify(polygon));
+    console.log();
 
     let projectedPolygon = geometryProjector.projectSingleShellPolygon(polygon);
 
