@@ -5,6 +5,9 @@
 //
 //  Name:            geometryProjector.js
 //  Original coding: Vasilis Vlastaras (@gisvlasta), 06/07/2019.
+//                   Vasilis Vlastaras (@gisvlasta), 25/07/2019.
+//                   Re-engineered to allow flexibility in accepting 'from' and 'to'
+//                   projections.
 // ================================================================================
 
 // Module Dependencies.
@@ -18,27 +21,19 @@ const projections = require('../models/projections');
 const GeometryProjector = {
 
   /**
-   * The name of the 'from' projection.
-   */
-  fromProjection: 'wgs84',
-
-  /**
-   * The name of the 'to' projection.
-   */
-  toProjection: 'osgb36',
-
-  /**
    * Projects the specified 2 dimensional coordinate from the 'fromProjection' to the 'toProjection' and
    * returns the projected coordinate.
    *
    * @param coordinate2D - The array holding the coordinates to project.
+   * @param fromProjection - The name of the 'from' projection.
+   * @param toProjection - The name of the 'to' projection.
    * @returns {Array.<number>}
    */
-  projectCoordinate2D: function(coordinate2D) {
+  projectCoordinate2D: function(coordinate2D, fromProjection, toProjection) {
 
     return proj4(
-      projections[this.fromProjection],
-      projections[this.toProjection],
+      projections[fromProjection],
+      projections[toProjection],
       [coordinate2D[0], coordinate2D[1]]
     );
 
@@ -49,13 +44,15 @@ const GeometryProjector = {
    * returns the projected jsts.geom.Coordinate.
    *
    * @param coordinate - The jsts.geom.Coordinate to project.
+   * @param fromProjection - The name of the 'from' projection.
+   * @param toProjection - The name of the 'to' projection.
    * @returns {jsts.geom.Coordinate}
    */
-  projectCoordinate: function(coordinate) {
+  projectCoordinate: function(coordinate, fromProjection, toProjection) {
 
     let coord = proj4(
-      projections[this.fromProjection],
-      projections[this.toProjection],
+      projections[fromProjection],
+      projections[toProjection],
       [coordinate.x, coordinate.y]
     );
 
@@ -73,15 +70,17 @@ const GeometryProjector = {
    * returns the projected jsts.geom.Point
    *
    * @param point - The specified point having the 'from' projection.
+   * @param fromProjection - The name of the 'from' projection.
+   * @param toProjection - The name of the 'to' projection.
    * @returns {jsts.geom.Point}
    */
-  projectPoint: function(point) {
+  projectPoint: function(point, fromProjection, toProjection) {
 
     let geoJsonReader = new jsts.io.GeoJSONReader();
 
     let coords = proj4(
-      projections[this.fromProjection],
-      projections[this.toProjection],
+      projections[fromProjection],
+      projections[toProjection],
       [point.getX(), point.getY()]
     );
 
@@ -99,9 +98,11 @@ const GeometryProjector = {
    * returns the projected jsts.geom.Polygon
    *
    * @param geoJsonPolygon - The specified polygon having the 'from' projection. This is a single shell polygon.
+   * @param fromProjection - The name of the 'from' projection.
+   * @param toProjection - The name of the 'to' projection.
    * @returns {jsts.geom.Polygon}
    */
-  projectSingleShellPolygon: function(geoJsonPolygon) {
+  projectSingleShellPolygon: function(geoJsonPolygon, fromProjection, toProjection) {
 
     let geoJsonReader = new jsts.io.GeoJSONReader();
 
@@ -109,7 +110,9 @@ const GeometryProjector = {
     let projectedPolygonCoordinates = [];
 
     for (i = 0; i < polygonCoordinates.length; i++) {
-      projectedPolygonCoordinates.push(GeometryProjector.projectCoordinate2D(polygonCoordinates[i]));
+      projectedPolygonCoordinates.push(
+        GeometryProjector.projectCoordinate2D(polygonCoordinates[i], fromProjection, toProjection )
+      );
     }
 
     let projectedGeoJsonPolygon = {

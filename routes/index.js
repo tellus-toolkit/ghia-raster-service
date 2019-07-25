@@ -5,6 +5,7 @@
 //
 //  Name:            index.js
 //  Original coding: Vasilis Vlastaras (@gisvlasta), 14/07/2019.
+//  Updated:         Vasilis Vlastaras (@gisvlasta), 25/07/2019.
 // ================================================================================
 
 // Module Dependencies.
@@ -34,12 +35,33 @@ module.exports = function(server) {
     let now = new Date().toISOString();
     console.log(now + ' GET: /ghia-raster-server' );
 
-    res.send({
-      'server': `${config.name}`,
-      'version': `${config.version}`
-    });
+    try {
 
-    return next();
+      res.send({
+        'server': `${config.name}`,
+        'version': `${config.version}`
+      });
+
+      return next();
+
+    }
+    catch (exception) {
+
+      console.log(exception);
+      console.log();
+
+      res.send({
+        error: {
+          verb: 'GET',
+          method: '/ghia-raster-server',
+          message: 'An Error has occurred while processing request',
+          details: exception.message
+        }
+      });
+
+      return next();
+
+    }
 
   });
 
@@ -54,38 +76,59 @@ module.exports = function(server) {
     let now = new Date().toISOString();
     console.log(now + ' GET: /ghia-raster-server/raster-metadata' );
 
-    // Get the band of the raster.
-    let band = raster.getBand();
+    try {
 
-    // Get the statistics of the raster band.
-    let statistics = band.getStatistics(false, true);
+      // Get the band of the raster.
+      let band = raster.getBand();
 
-    let rasterMetadata = {
-      cellSize: raster.getCellSize(),
-      tileSize: raster.getTileSize(),
-      minimumX: raster.getXmin(),
-      minimumY: raster.getYmin(),
-      columns: raster.getBandColumns(),
-      rows:  raster.getBandRows(),
-      band:{
-        dataType: band.dataType,
-        minimum: band.minimum,
-        maximum: band.maximum,
-        noDataValue: band.noDataValue,
-        statistics: {
-          minimum: statistics.min,
-          maximum: statistics.max,
-          average: statistics.mean,
-          StandardDeviation: statistics.std_dev
-        },
-        lookup: raster.lookup,
-        dictionary: raster.dictionary
-      }
-    };
+      // Get the statistics of the raster band.
+      let statistics = band.getStatistics(false, true);
 
-    res.send(rasterMetadata);
+      let rasterMetadata = {
+        cellSize: raster.getCellSize(),
+        tileSize: raster.getTileSize(),
+        minimumX: raster.getXmin(),
+        minimumY: raster.getYmin(),
+        columns: raster.getBandColumns(),
+        rows:  raster.getBandRows(),
+        band:{
+          dataType: band.dataType,
+          minimum: band.minimum,
+          maximum: band.maximum,
+          noDataValue: band.noDataValue,
+          statistics: {
+            minimum: statistics.min,
+            maximum: statistics.max,
+            average: statistics.mean,
+            StandardDeviation: statistics.std_dev
+          },
+          lookup: raster.lookup,
+          dictionary: raster.dictionary
+        }
+      };
 
-    return next();
+      res.send(rasterMetadata);
+
+      return next();
+
+    }
+    catch (exception) {
+
+      console.log(exception);
+      console.log();
+
+      res.send({
+        error: {
+          verb: 'GET',
+          method: '/ghia-raster-server/raster-metadata',
+          message: 'An Error has occurred while processing request',
+          details: exception.message
+        }
+      });
+
+      return next();
+
+    }
 
   });
 
@@ -97,48 +140,99 @@ module.exports = function(server) {
    */
   server.get('/report/@:lat(^[-]?\\d*\\.?\\d*),:lon(^[-]?\\d*\\.?\\d*)', (req, res, next) => {
 
-    var now = new Date().toISOString();
+    let now = new Date().toISOString();
     console.log(now + ' GET: /ghia-raster-server/report/:lat=' + req.params.lat + ',:lon=' + req.params.lon);
 
-    let coordinate = [parseFloat(req.params.lon), parseFloat(req.params.lat)];
+    try {
 
-    let projectedCoordinate = geometryProjector.projectCoordinate2D(coordinate);
+      let coordinate = [parseFloat(req.params.lon), parseFloat(req.params.lat)];
 
-    let upperLeftCell = rasterLocator.getCellByXY(projectedCoordinate[0] - 500, projectedCoordinate[1] + 500);
-    let lowerRightCell = rasterLocator.getCellByXY(projectedCoordinate[0] + 500, projectedCoordinate[1] - 500);
+      let projectedCoordinate = geometryProjector.projectCoordinate2D(coordinate, 'wgs84', 'osgb36');
 
-    let width = lowerRightCell[0] - upperLeftCell[0] + 1;
-    let height = lowerRightCell[1] - upperLeftCell[1] + 1;
+      let projectedEnvelope = {
+        xMin: projectedCoordinate[0] - 500,
+        yMin: projectedCoordinate[1] - 500,
+        xMax: projectedCoordinate[0] + 500,
+        yMax: projectedCoordinate[1] + 500
+      };
 
-    let buffer = rasterReader.read(upperLeftCell[0], upperLeftCell[1], width, height);
+      let upperLeftCell = rasterLocator.getCellByXY(projectedEnvelope.xMin, projectedEnvelope.yMax);
+      let lowerRightCell = rasterLocator.getCellByXY(projectedEnvelope.xMax, projectedEnvelope.xMin);
 
-    let histogram = rasterReader.getEnvelopeHistogram(buffer);
 
-    let report = {
-      location: {
-        geographic: {
-          lon: coordinate[0],
-          lat: coordinate[1]
+      let geographicEnvelope = {
+        ll: geometryProjector.projectCoordinate2D(
+          [projectedEnvelope.xMin, projectedEnvelope.yMin],
+          'osgb36',
+          'wgs84'
+        ),
+        ur: geometryProjector.projectCoordinate2D(
+          [projectedEnvelope.xMax, projectedEnvelope.yMax],
+          'osgb36',
+          'wgs84'
+        )
+      };
+
+      let width = lowerRightCell[0] - upperLeftCell[0] + 1;
+      let height = lowerRightCell[1] - upperLeftCell[1] + 1;
+
+      let buffer = rasterReader.read(upperLeftCell[0], upperLeftCell[1], width, height);
+
+      let histogram = rasterReader.getEnvelopeHistogram(buffer);
+
+      let report = {
+        location: {
+          geographic: {
+            lon: coordinate[0],
+            lat: coordinate[1]
+          },
+          projected: {
+            x: projectedCoordinate[0],
+            y: projectedCoordinate[1]
+          }
         },
-        projected: {
-          x: projectedCoordinate[0],
-          y: projectedCoordinate[1]
+        rectangle: {
+          geographic: {
+            minLon: geographicEnvelope.ll[0],
+            minLat: geographicEnvelope.ll[1],
+            maxLon: geographicEnvelope.ur[0],
+            maxLat: geographicEnvelope.ur[1]
+          },
+          projected: projectedEnvelope
+        },
+        rasterExtract: {
+          envelope: {
+            minRow: upperLeftCell[1],
+            minCol: upperLeftCell[0],
+            maxRow: lowerRightCell[1],
+            maxCol: lowerRightCell[0]
+          },
+          histogram: histogram
         }
-      },
-      rasterExtract: {
-        envelope: {
-          minRow: upperLeftCell[1],
-          minCol: upperLeftCell[0],
-          maxRow: lowerRightCell[1],
-          maxCol: lowerRightCell[0]
-        },
-        histogram: histogram
-      }
-    };
+      };
 
-    res.send(report);
+      res.send(report);
 
-    return next();
+      return next();
+
+    }
+    catch (exception) {
+
+      console.log(exception);
+      console.log();
+
+      res.send({
+        error: {
+          verb: 'GET',
+          method: '/report',
+          message: 'An Error has occurred while processing request',
+          details: exception.message
+        }
+      });
+
+      return next();
+
+    }
 
   });
 
@@ -150,50 +244,73 @@ module.exports = function(server) {
    */
   server.post('/report', (req, res, next) => {
 
-    var now = new Date().toISOString();
+    let now = new Date().toISOString();
     console.log(now + ' POST: /ghia-raster-server/report/');
 
-    let polygon = req.params.polygon;
+    try {
 
-    console.log(JSON.stringify(polygon));
-    console.log();
+      let polygon = req.params.polygon;
 
-    let projectedPolygon = geometryProjector.projectSingleShellPolygon(polygon);
+      console.log(JSON.stringify(polygon));
+      console.log();
 
-    let geoJsonWriter = new jsts.io.GeoJSONWriter();
+      let projectedPolygon = geometryProjector.projectSingleShellPolygon(polygon, 'wgs84', 'osgb36');
 
-    let projectedPolygonGeoJSON = geoJsonWriter.write(projectedPolygon);
+      let geoJsonWriter = new jsts.io.GeoJSONWriter();
 
-    let coords = projectedPolygon.getCoordinates();
+      let projectedPolygonGeoJSON = geoJsonWriter.write(projectedPolygon);
 
-    let envelope = rasterLocator.getEnvelopeCells(coords);
+      let coords = projectedPolygon.getCoordinates();
 
-    let width = envelope[1][0] - envelope[0][0] + 1;
-    let height = envelope[1][1] - envelope[0][1] + 1;
+      let envelope = rasterLocator.getEnvelopeCells(coords);
 
-    let buffer = rasterReader.read(envelope[0][0], envelope[0][1], width, height);
+      let width = envelope[1][0] - envelope[0][0] + 1;
+      let height = envelope[1][1] - envelope[0][1] + 1;
 
-    let histogram = rasterReader.getPolygonHistogram(buffer, envelope, projectedPolygon);
+      let buffer = rasterReader.read(envelope[0][0], envelope[0][1], width, height);
 
-    let report = {
-      polygon: {
-        geographic: polygon,
-        projected: projectedPolygonGeoJSON
-      },
-      rasterExtract: {
-        envelope: {
-          minRow: envelope[0][1],
-          minCol: envelope[0][0],
-          maxRow: envelope[1][1],
-          maxCol: envelope[1][0]
+      let histogram = rasterReader.getPolygonHistogram(buffer, envelope, projectedPolygon);
+
+      let report = {
+        polygon: {
+          geographic: polygon,
+          projected: projectedPolygonGeoJSON
         },
-        histogram: histogram
-      }
-    };
+        rasterExtract: {
+          envelope: {
+            minRow: envelope[0][1],
+            minCol: envelope[0][0],
+            maxRow: envelope[1][1],
+            maxCol: envelope[1][0]
+          },
+          histogram: histogram
+        }
+      };
 
-    res.send(report);
+      res.send(report);
 
-    return next();
+      return next();
+
+    }
+    catch (exception) {
+
+      console.log(exception);
+      console.log();
+
+      res.send({
+        error: {
+          verb: 'POST',
+          method: '/report',
+          message: 'An Error has occurred while processing request',
+          details: exception.message
+        }
+      });
+
+      return next();
+
+    }
+
+
 
   });
 
