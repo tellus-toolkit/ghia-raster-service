@@ -157,8 +157,7 @@ module.exports = function(server) {
       };
 
       let upperLeftCell = rasterLocator.getCellByXY(projectedEnvelope.xMin, projectedEnvelope.yMax);
-      let lowerRightCell = rasterLocator.getCellByXY(projectedEnvelope.xMax, projectedEnvelope.xMin);
-
+      let lowerRightCell = rasterLocator.getCellByXY(projectedEnvelope.xMax, projectedEnvelope.yMin);
 
       let geographicEnvelope = {
         ll: geometryProjector.projectCoordinate2D(
