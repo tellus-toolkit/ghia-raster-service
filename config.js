@@ -7,6 +7,7 @@
 //  Original coding: Vasilis Vlastaras (@gisvlasta), 16/07/2019.
 //  Updated:         Vasilis Vlastaras (@gisvlasta), 21/07/2019.
 //                   Vasilis Vlastaras (@gisvlasta), 25/07/2019.
+//                   Vasilis Vlastaras (@gisvlasta), 29/07/2019.
 // ================================================================================
 
 /**
@@ -14,7 +15,7 @@
  */
 module.exports = {
   name: 'GHIA Raster Server',
-  version: '1.1.0',
+  version: '1.1.1',
   //env: process.env.NODE_ENV || 'development',
   env: 'production',
   port: process.env.PORT || 8083,

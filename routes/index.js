@@ -6,6 +6,8 @@
 //  Name:            index.js
 //  Original coding: Vasilis Vlastaras (@gisvlasta), 14/07/2019.
 //  Updated:         Vasilis Vlastaras (@gisvlasta), 25/07/2019.
+//                   Vasilis Vlastaras (@gisvlasta), 29/07/2019.
+//                   Minor changes in endpoint /raster-meatadata
 // ================================================================================
 
 // Module Dependencies.
@@ -93,14 +95,12 @@ module.exports = function(server) {
         rows:  raster.getBandRows(),
         band:{
           dataType: band.dataType,
-          minimum: band.minimum,
-          maximum: band.maximum,
           noDataValue: band.noDataValue,
           statistics: {
             minimum: statistics.min,
             maximum: statistics.max,
             average: statistics.mean,
-            StandardDeviation: statistics.std_dev
+            standardDeviation: statistics.std_dev
           },
           lookup: raster.lookup,
           dictionary: raster.dictionary
