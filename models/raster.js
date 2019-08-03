@@ -5,6 +5,8 @@
 //
 //  Name:            raster.js
 //  Original coding: Vasilis Vlastaras (@gisvlasta), 06/07/2019.
+//                   Vasilis Vlastaras (@gisvlasta), 03/08/2019.
+//                   Corrected Canopy to canopy.
 // ================================================================================
 
 /**
@@ -252,7 +254,7 @@ const Raster = {
     },
     {
       field: "form",
-      term: "Tree Canopy",
+      term: "Tree canopy",
       description: "Tree canopy"
     },
     {
@@ -313,7 +315,7 @@ const Raster = {
     {
       field: "function",
       term: "Urban Other Tree canopy",
-      description: "Land-use: Urban other; Land-cover: Tree Canopy"
+      description: "Land-use: Urban other; Land-cover: Tree canopy"
     },
     {
       field: "function",
@@ -338,7 +340,7 @@ const Raster = {
     {
       field: "function",
       term: "Public Recreation Tree canopy",
-      description: "Land-use: Public Parks and Recreation: Land-cover: Tree Canopy"
+      description: "Land-use: Public Parks and Recreation: Land-cover: Tree canopy"
     },
     {
       field: "function",
@@ -363,7 +365,7 @@ const Raster = {
     {
       field: "function",
       term: "Amenity Tree canopy",
-      description: "Land-use: Amenity; Land-cover: Tree Canopy"
+      description: "Land-use: Amenity; Land-cover: Tree canopy"
     },
     {
       field: "function",
@@ -388,7 +390,7 @@ const Raster = {
     {
       field: "function",
       term: "Domestic Gardens Tree canopy",
-      description: "Land-use: Domestic Gardens; Land-cover: Tree Canopy"
+      description: "Land-use: Domestic Gardens; Land-cover: Tree canopy"
     },
     {
       field: "function",
@@ -413,7 +415,7 @@ const Raster = {
     {
       field: "function",
       term: "Institutional Tree canopy",
-      description: "Land-use: Institutional Land; Land-cover: Tree Canopy"
+      description: "Land-use: Institutional Land; Land-cover: Tree canopy"
     },
     {
       field: "function",
@@ -438,7 +440,7 @@ const Raster = {
     {
       field: "function",
       term: "Previously Developed Tree canopy",
-      description: "Land-use: Previously developed; Land-cover: Tree Canopy"
+      description: "Land-use: Previously developed; Land-cover: Tree canopy"
     },
     {
       field: "function",
@@ -463,7 +465,7 @@ const Raster = {
     {
       field: "function",
       term: "Peri-urban Tree canopy",
-      description: "Land-use: Peri-urban; Land-cover: Tree Canopy"
+      description: "Land-use: Peri-urban; Land-cover: Tree canopy"
     }
   ],
 
