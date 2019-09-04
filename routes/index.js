@@ -8,6 +8,8 @@
 //  Updated:         Vasilis Vlastaras (@gisvlasta), 25/07/2019.
 //                   Vasilis Vlastaras (@gisvlasta), 29/07/2019.
 //                   Minor changes in endpoint /raster-meatadata
+//                   Vasilis Vlastaras (@gisvlasta), 04/09/2019.
+//                   Report by polygon is now returning centroids as well.
 // ================================================================================
 
 // Module Dependencies.
@@ -253,11 +255,16 @@ module.exports = function(server) {
       console.log(JSON.stringify(polygon));
       console.log();
 
-      let projectedPolygon = geometryProjector.projectSingleShellPolygon(polygon, 'wgs84', 'osgb36');
-
       let geoJsonWriter = new jsts.io.GeoJSONWriter();
 
+      let projectedPolygon = geometryProjector.projectSingleShellPolygon(polygon, 'wgs84', 'osgb36');
       let projectedPolygonGeoJSON = geoJsonWriter.write(projectedPolygon);
+
+      let projectedCentroid = projectedPolygon.getCentroid();
+      let projectedCentroidGeoJSON = geoJsonWriter.write(projectedCentroid);
+
+      let centroid = geometryProjector.projectPoint(projectedCentroid, 'osgb36', 'wgs84');
+      let centroidGeoJSON = geoJsonWriter.write(centroid);
 
       let coords = projectedPolygon.getCoordinates();
 
@@ -274,6 +281,10 @@ module.exports = function(server) {
         polygon: {
           geographic: polygon,
           projected: projectedPolygonGeoJSON
+        },
+        centroid: {
+          geographic: centroidGeoJSON,
+          projected: projectedCentroidGeoJSON
         },
         rasterExtract: {
           envelope: {
@@ -308,8 +319,6 @@ module.exports = function(server) {
       return next();
 
     }
-
-
 
   });
 

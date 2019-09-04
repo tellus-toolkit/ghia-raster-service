@@ -69,7 +69,7 @@ const GeometryProjector = {
    * Projects the specified point from the 'fromProjection' to the 'toProjection' and
    * returns the projected jsts.geom.Point
    *
-   * @param point - The specified point having the 'from' projection.
+   * @param point - The specified jsts.geom.point having the 'from' projection.
    * @param fromProjection - The name of the 'from' projection.
    * @param toProjection - The name of the 'to' projection.
    * @returns {jsts.geom.Point}
@@ -97,7 +97,7 @@ const GeometryProjector = {
    * Projects the specified GeoJSON Polygon from the 'fromProjection' to the 'toProjection' and
    * returns the projected jsts.geom.Polygon
    *
-   * @param geoJsonPolygon - The specified polygon having the 'from' projection. This is a single shell polygon.
+   * @param geoJsonPolygon - The specified geoJSON polygon having the 'from' projection. This is a single shell polygon.
    * @param fromProjection - The name of the 'from' projection.
    * @param toProjection - The name of the 'to' projection.
    * @returns {jsts.geom.Polygon}

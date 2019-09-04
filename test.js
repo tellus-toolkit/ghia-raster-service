@@ -6,7 +6,7 @@ const config = require('./config');
 const restify = require('restify');
 const restifyPlugins = require('restify').plugins;
 const jsts = require('jsts');
-const raster = require('./models/raster.js');
+//const raster = require('./models/raster.js');
 const rasterReader = require('./operations/rasterReader.js');
 const rasterLocator = require('./operations/rasterLocator.js');
 const geometryProjector = require('./operations/geometryProjector');
@@ -96,7 +96,7 @@ let geoJSON = {
 };
 
 let p1 = geoJsonReader.read(geoJSON);
-let projectedP1 = geometryProjector.projectPoint(p1);
+let projectedP1 = geometryProjector.projectPoint(p1, 'wgs84', 'osgb36');
 
 console.log('');
 console.log('--------');
@@ -110,7 +110,7 @@ console.log(rasterLocator.getCell(projectedP1.getCoordinate()));
 geoJSON.coordinates = p2Location.coord;
 
 let p2 = geoJsonReader.read(geoJSON);
-let projectedP2 = geometryProjector.projectPoint(p2);
+let projectedP2 = geometryProjector.projectPoint(p2, 'wgs84', 'osgb36');
 
 console.log('');
 console.log('--------');
@@ -135,7 +135,7 @@ geoJSON = {
   ]
 };
 
-let projectedPolygon = geometryProjector.projectSingleShellPolygon(geoJSON);
+let projectedPolygon = geometryProjector.projectSingleShellPolygon(geoJSON, 'wgs84', 'osgb36');
 
 console.log('');
 console.log('--------');
@@ -163,14 +163,14 @@ let pixelData = rasterReader.read(upperLeftCell[0], upperLeftCell[1], 100, 100);
 
 console.log(pixelData);
 
-for (let i = 0; i < pixelData.length; i++) {
-  console.log(pixelData[i]);
-}
-
-let histogram = rasterReader.getBufferHistogram(pixelData);
-
-for (var key in histogram) {
-  if (histogram.hasOwnProperty(key)) {
-    console.log(key + ': ' + histogram[key]);
-  }
-}
+// for (let i = 0; i < pixelData.length; i++) {
+//   console.log(pixelData[i]);
+// }
+//
+// let histogram = rasterReader.getBufferHistogram(pixelData);
+//
+// for (var key in histogram) {
+//   if (histogram.hasOwnProperty(key)) {
+//     console.log(key + ': ' + histogram[key]);
+//   }
+// }
