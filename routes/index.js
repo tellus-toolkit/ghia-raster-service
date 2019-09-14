@@ -7,9 +7,11 @@
 //  Original coding: Vasilis Vlastaras (@gisvlasta), 14/07/2019.
 //  Updated:         Vasilis Vlastaras (@gisvlasta), 25/07/2019.
 //                   Vasilis Vlastaras (@gisvlasta), 29/07/2019.
-//                   Minor changes in endpoint /raster-meatadata
+//                   Minor changes in endpoint /raster-metadata
 //                   Vasilis Vlastaras (@gisvlasta), 04/09/2019.
 //                   Report by polygon is now returning centroids as well.
+//                   Vasilis Vlastaras (@gisvlasta), 04/09/2019.
+//                   /raster-metadata now returns the raster numberOfValues.
 // ================================================================================
 
 // Module Dependencies.
@@ -95,6 +97,7 @@ module.exports = function(server) {
         minimumY: raster.getYmin(),
         columns: raster.getBandColumns(),
         rows:  raster.getBandRows(),
+        numberOfValues: raster.getNumberOfValues(),
         band:{
           dataType: band.dataType,
           noDataValue: band.noDataValue,
